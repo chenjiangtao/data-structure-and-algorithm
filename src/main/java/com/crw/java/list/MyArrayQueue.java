@@ -1,6 +1,4 @@
-package com.crw.java.adt;
-
-import java.util.Iterator;
+package com.crw.java.list;
 
 /**
  * 通过数组实现队列

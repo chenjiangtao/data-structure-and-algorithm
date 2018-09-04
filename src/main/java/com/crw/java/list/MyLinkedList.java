@@ -1,4 +1,4 @@
-package com.crw.java.adt;
+package com.crw.java.list;
 
 import java.util.*;
 

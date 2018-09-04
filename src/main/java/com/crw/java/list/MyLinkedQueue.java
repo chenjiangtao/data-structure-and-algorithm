@@ -1,4 +1,4 @@
-package com.crw.java.adt;
+package com.crw.java.list;
 
 /**
  * 通过单向链表实现队列

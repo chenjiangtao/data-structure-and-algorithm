@@ -90,9 +90,9 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
 
         int compareValue = t.compareTo(node.element); // 与当前节点比较
         if (compareValue < 0) { // 比当前节点小就与左子树比较
-            node = insert(t, node.left);
+            node.left = insert(t, node.left);
         } else if (compareValue > 0) { // 比当前节点大就与右子树比较
-            node = insert(t, node.right);
+            node.right = insert(t, node.right);
         } else {
             // do nothing;
         }

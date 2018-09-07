@@ -100,4 +100,92 @@ public class AvlTree<T extends Comparable<? super T>> {
 
         return right;
     }
+
+    /**
+     * LR：左右对应的情况(左双旋转)。
+     * 进行两次旋转：
+     * 1.以"根节点的左子树"为根节点进行一次RR单旋。
+     * 2.以"根节点"为根节点进行一次LL单旋。
+     *
+     * @param root
+     * @return 旋转后的根节点
+     */
+    private AVLNode<T> leftRightRotation(AVLNode<T> root) {
+        root.left = rightRightRotation(root.left); // 1.以"根节点的左子树"为根节点进行一次RR单旋。
+        return leftLeftRotation(root); // 2.以"根节点"为根节点进行一次LL单旋。
+    }
+
+    /**
+     * RL：右左对应的情况(右双旋转)。
+     * LR双旋的对称情况：
+     * 1.以"根节点的右子树"为根节点进行一次LL单旋。
+     * 2.以"根节点"为根节点进行一次RR单旋。
+     *
+     * @param root
+     * @return
+     */
+    private AVLNode<T> rightLeftRotation(AVLNode<T> root) {
+        root.right = leftLeftRotation(root.right);
+        return rightRightRotation(root);
+    }
+
+    public void insert(T x) {
+        root = insert(x, root);
+    }
+
+    /**
+     * 将结点插入到AVL树中，并返回根节点.
+     * 基本与二叉查找树差不多，再加入平衡动作即可。
+     *
+     * @param x    要插入的元素
+     * @param node AVL树的根节点
+     * @return
+     */
+    private AVLNode<T> insert(T x, AVLNode<T> node) {
+        if (node == null) {
+            return new AVLNode<T>(x);
+        }
+
+        int compareResult = x.compareTo(node.element);
+        if (compareResult < 0) { // 比当前元素小，插入左子树
+            node.left = insert(x, node.left);
+        } else if (compareResult > 0) { // 比当前元素大，插入右子树
+            node.right = insert(x, node.right);
+        } else {
+            // do nothing
+        }
+        return balance(node);
+    }
+
+    /**
+     * 平衡当前节点
+     *
+     * @param node
+     * @return
+     */
+    private AVLNode<T> balance(AVLNode<T> node) {
+        if (node == null) {
+            return null;
+        }
+
+        if (height(node.left) - height(node.right) > 1) { // 左子树比右子树高度之差大于等于2，不平衡
+            if (height(node.left.left) > height(node.left.right)) { // 左子树的左子树 比 左子树的右子树高，属于LL情况
+                leftLeftRotation(node);
+            } else { // 否则，属于 LR情况
+                leftRightRotation(node);
+            }
+        } else if (height(node.right) - height(node.left) > 1) { // 右子树比左子树高度之差大于等于2，不平衡
+            if (height(node.left.left) > height(node.left.right)) { // 右子树的左子树 比 右子树的右子树高，属于RL情况
+                rightLeftRotation(node);
+            } else { // 否则，属于 RR情况
+                rightRightRotation(node);
+            }
+        }
+        return node;
+    }
+
+
+    private AVLNode<T> remove(AVLNode<T> tree, AVLNode<T> z) {
+        return null;
+    }
 }

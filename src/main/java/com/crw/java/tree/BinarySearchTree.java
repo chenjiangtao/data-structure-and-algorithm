@@ -173,6 +173,9 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
         return node;
     }
 
+    private void remove(T t) {
+        root = remove(t, root);
+    }
 
     public void printTree() {
         if (isEmpty()) {
@@ -203,6 +206,10 @@ public class BinarySearchTree<T extends Comparable<? super T>> {
         tree.insert(3);
         tree.insert(7);
         tree.insert(5);
+        tree.printTree();
+
+        tree.remove(5);
+        tree.remove(8);
         tree.printTree();
     }
 }

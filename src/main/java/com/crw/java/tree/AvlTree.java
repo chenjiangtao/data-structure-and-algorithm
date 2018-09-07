@@ -49,17 +49,6 @@ public class AvlTree<T extends Comparable<? super T>> {
     }
 
     /**
-     * 获取较大的值
-     *
-     * @param a
-     * @param b
-     * @return
-     */
-    private int max(int a, int b) {
-        return a > b ? a : b;
-    }
-
-    /**
      * LL：左左对应的情况(左单旋转)。
      * 围绕"失去平衡的AVL根节点"进行操作，因为是LL的情况，就用手抓着"左孩子"使劲摇，
      * 1.将"左孩子"变成AVL根节点，
@@ -185,7 +174,248 @@ public class AvlTree<T extends Comparable<? super T>> {
     }
 
 
-    private AVLNode<T> remove(AVLNode<T> tree, AVLNode<T> z) {
-        return null;
+    public boolean isEmpty() {
+        return this.root == null;
+    }
+
+    public T findMin() {
+        if (isEmpty()) {
+            return null;
+        }
+        return findMin(root).element;
+    }
+
+    /**
+     * 查找某节点下最小的节点,递归方式
+     *
+     * @param node
+     * @return
+     */
+    private AVLNode<T> findMin(AVLNode<T> node) {
+        if (node == null) {
+            return null;
+        } else if (node.left != null) {
+            return findMin(node.left);
+        } else {
+            return node;
+        }
+    }
+
+    public T findMax() {
+        if (isEmpty()) {
+            return null;
+        }
+        return findMax(root).element;
+    }
+
+    /**
+     * 某节点下找到最大的节点,while循环方式
+     *
+     * @param node
+     * @return
+     */
+    private AVLNode<T> findMax(AVLNode<T> node) {
+        if (node == null) {
+            return null;
+        }
+        while (node.right != null) {
+            node = node.right;
+        }
+        return node;
+    }
+
+    /**
+     * 删除节点，此处和 BinarySearchTree.java 中类似，只需要最好平衡一下节点即可
+     *
+     * @param t
+     * @param node
+     * @return
+     */
+    /*private AVLNode<T> remove(T t, AVLNode<T> node) {
+        if (node == null) {
+            return node; // 找不到指定的元素
+        }
+        int compareValue = t.compareTo(node.element);
+        if (compareValue < 0) { // 从左子树上查找值为t的节点
+            node.left = remove(t, node.left);
+        } else if (compareValue > 0) { // 从右子树上查找值为t的节点
+            node.right = remove(t, node.right);
+        } else if (node.left != null && node.right != null) { // 找到该节点，并且该节点有两个儿子
+            node.element = findMin(node.right).element; // 找到右子树上最小的元素替换当前节点的元素
+            node.right = remove(node.element, node.right); // 递归删除右子树上的当前元素
+        } else { // 找到该节点，并且节点只有一个儿子
+            node = (node.left != null) ? node.left : node.right;
+        }
+        return balance(node);
+    }*/
+
+    /**
+     * 删除的另一种写法，思路基本不变。三种情况删除。
+     *
+     * @param t    元素
+     * @param node 根数下的某节点
+     * @return
+     */
+    private AVLNode<T> remove(T t, AVLNode<T> node) {
+        if (t == null || node == null) { // 找不到指定元素
+            return null;
+        }
+        int compareValue = t.compareTo(node.element);
+        if (compareValue < 0) { // 要删除的节点在左子树
+            node.left = remove(t, node.left);
+        } else if (compareValue > 0) { // 要删除的节点在右子树
+            node.right = remove(t, node.right);
+        } else { // node就是要删除的节点
+            if ((node.left != null) && (node.right != null)) { // 当前节点有俩个孩子
+                if (height(node.left) > height(node.right)) { // 左子树比右子树高，则1.找到左子树的最大节点；2.将该值赋值给当前节点node；3.删除该最大节点
+                    AVLNode<T> max = findMax(node);
+                    node.element = max.element;
+                    node.left = remove(max.element, node.left);
+                } else { // 右子树比左子树高，则1.找到右子树的最小节点；2.将该值赋值给当前节点node；3.删除该最小节点
+                    AVLNode<T> min = findMin(node);
+                    node.element = min.element;
+                    node.right = remove(min.element, node.right);
+                }
+            } else { // 当前节点只有一个孩子
+                node = (node.left != null) ? node.left : node.right;
+            }
+        }
+
+        return balance(node);
+    }
+
+    private void remove(T t) {
+        root = remove(t, root);
+    }
+
+
+    /*
+     * 前序遍历"AVL树"
+     */
+    private void preOrder(AVLNode<T> node) {
+        if (node != null) {
+            System.out.print(node.element + " ");
+            preOrder(node.left);
+            preOrder(node.right);
+        }
+    }
+
+    public void preOrder() {
+        preOrder(root);
+    }
+
+    /*
+     * 中序遍历"AVL树"
+     */
+    private void inOrder(AVLNode<T> node) {
+        if (node != null) {
+            inOrder(node.left);
+            System.out.print(node.element + " ");
+            inOrder(node.right);
+        }
+    }
+
+    public void inOrder() {
+        inOrder(root);
+    }
+
+    /*
+     * 后序遍历"AVL树"
+     */
+    private void postOrder(AVLNode<T> node) {
+        if (node != null) {
+            postOrder(node.left);
+            postOrder(node.right);
+            System.out.print(node.element + " ");
+        }
+    }
+
+    public void postOrder() {
+        postOrder(root);
+    }
+
+    /*
+     * 打印"二叉查找树"
+     *
+     * key        -- 节点的键值
+     * direction  --  0，表示该节点是根节点;
+     *               -1，表示该节点是它的父结点的左孩子;
+     *                1，表示该节点是它的父结点的右孩子。
+     */
+    private void print(AVLNode<T> node, T x, int direction) {
+        if (node != null) {
+            if (direction == 0)    // tree是根节点
+                System.out.printf("%2d is root\n", node.element, x);
+            else                // tree是分支节点
+                System.out.printf("%2d is %2d's %6s child\n", node.element, x, direction == 1 ? "right" : "left");
+
+            print(node.left, node.element, -1);
+            print(node.right, node.element, 1);
+        }
+    }
+
+    public void print() {
+        if (root != null)
+            print(root, root.element, 0);
+    }
+
+    /*
+     * 销毁AVL树
+     */
+    private void destroy(AVLNode<T> node) {
+        if (node == null)
+            return;
+
+        if (node.left != null)
+            destroy(node.left);
+        if (node.right != null)
+            destroy(node.right);
+
+        node = null;
+    }
+
+    public void destroy() {
+        destroy(root);
+    }
+
+    public static void main(String[] args) {
+        int arr[] = {3, 2, 1, 4, 5, 6, 7, 16, 15, 14, 13, 12, 11, 10, 8, 9};
+        int i;
+        AvlTree<Integer> tree = new AvlTree<Integer>();
+
+        System.out.printf("== 依次添加: ");
+        for (i = 0; i < arr.length; i++) {
+            System.out.printf("%d ", arr[i]);
+            tree.insert(arr[i]);
+        }
+
+        System.out.printf("\n== 前序遍历: ");
+        tree.preOrder();
+
+        System.out.printf("\n== 中序遍历: ");
+        tree.inOrder();
+
+        System.out.printf("\n== 后序遍历: ");
+        tree.postOrder();
+        System.out.printf("\n");
+
+        System.out.printf("== 高度: %d\n", tree.height());
+        System.out.printf("== 最小值: %d\n", tree.findMin());
+        System.out.printf("== 最大值: %d\n", tree.findMax());
+        System.out.printf("== 树的详细信息: \n");
+        tree.print();
+
+        i = 8;
+        System.out.printf("\n== 删除根节点: %d", i);
+        tree.remove(i);
+
+        System.out.printf("\n== 高度: %d", tree.height());
+        System.out.printf("\n== 中序遍历: ");
+        tree.inOrder();
+        System.out.printf("\n== 树的详细信息: \n");
+        tree.print();
+
+        // 销毁二叉树
+        tree.destroy();
     }
 }

@@ -1,12 +1,12 @@
 package com.crw.java.sort;
 
 /**
- * 直接插入排序
+ * 折半插入排序
  * <p>
  * 时间复杂度：O(n^2)；空间复杂度为O(1)；稳定的排序
- * 适用于n很小的情况
+ * 相对于直接插入只是减少了比较的次数，但元素移动的次数不变
  */
-public class InsertSort {
+public class BinaryInsertSort {
 
     public static void main(String[] args) {
         int[] arr = {4, 2, 56, 23, 12, 33, 18, 24};
@@ -17,16 +17,23 @@ public class InsertSort {
     }
 
     public static void sort(int[] arr) {
-        int idx; // 有序子表索引位置
         for (int i = 1; i < arr.length; i++) {
-            if (arr[i] < arr[i - 1]) { // 比较，将i插入有序子表
-                int temp = arr[i]; // 待插入元素
-                for (idx = i - 1; idx >= 0 && arr[idx] > temp; idx--) { // 从已排序数列的最后一个比较
-                    arr[idx + 1] = arr[idx]; // 记录后移
+            int temp = arr[i]; // 暂存待插入元素
+            int low = 0;
+            int high = i - 1;
+            while (low <= high) {
+                int mid = (low + high) / 2; // 折半
+                if (temp < arr[mid]) { // 插入点在低半区
+                    high = mid - 1;
+                } else { // 插入点在高半区
+                    low = mid + 1;
                 }
-                arr[idx + 1] = temp; // 待排序元素插入
-                print(arr, i, idx + 1);
             }
+            for (int j = i - 1; j >= high + 1; j--) { // 记录后移
+                arr[j + 1] = arr[j];
+            }
+            arr[high + 1] = temp; // 插入
+            print(arr, i, low);
         }
     }
 
@@ -40,5 +47,4 @@ public class InsertSort {
             }
         }
     }
-
 }
